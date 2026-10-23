@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffca45">
+  <title>Jadwal Piket & Tugas Kelas</title>
+  <style>
+    :root {
+      --yellow: #ffd84d;
+      --yellow-soft: #fff6c9;
+      --pink: #ff8fbd;
+      --pink-dark: #e95691;
+      --pink-soft: #fff0f6;
+      --ink: #382b3b;
+      --muted: #817282;
+      --white: #fffdfb;
+      --line: #f2e4e9;
+      --green: #4f9e77;
+      --shadow: 0 14px 40px rgba(110, 64, 83, .09);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; color: var(--ink);
+      font-family: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 5%, #fff1b9 0, transparent 24rem),
+        radial-gradient(circle at 94% 15%, #ffe0ed 0, transparent 25rem),
+        #fffafc;
+      line-height: 1.55;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .wrap { width: min(1120px, calc(100% - 36px)); margin: auto; }
+    header { padding: 22px 0 8px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 900; letter-spacing: -.4px; }
+    .brand-mark { width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center; font-size: 1.45rem; background: var(--yellow); box-shadow: 0 7px 0 #efbd31; transform: rotate(-4deg); }
+    .brand small { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .2px; }
+    .today-pill { border: 1px solid #f6d7e3; border-radius: 999px; background: #fff; color: var(--pink-dark); padding: 9px 14px; font-size: .84rem; font-weight: 800; }
+    .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 25px; align-items: stretch; padding: 30px 0 24px; }
+    .hero-copy { padding: 32px; border-radius: 28px; background: linear-gradient(125deg, #ffe36c, #ffd54c 60%, #ffc6dd); position: relative; overflow: hidden; }
+    .hero-copy::after { content: "✿"; position: absolute; font-size: 12rem; color: #fff8; right: -10px; bottom: -80px; transform: rotate(-20deg); pointer-events: none; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 7px; border: 1px solid #fff8; background: #ffffff90; border-radius: 999px; padding: 6px 12px; font-size: .78rem; font-weight: 900; }
+    h1 { margin: 16px 0 10px; font-size: clamp(2.2rem, 5vw, 3.7rem); letter-spacing: -2px; line-height: 1.05; max-width: 600px; }
+    .hero-copy p { max-width: 520px; margin: 0; color: #594538; font-weight: 650; }
+    .hero-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; position: relative; z-index: 1; }
+    .btn { border: 0; border-radius: 13px; padding: 11px 16px; font-weight: 850; transition: transform .18s, box-shadow .18s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-dark { background: var(--ink); color: white; box-shadow: 0 5px 0 #5b4357; }
+    .btn-white { background: white; color: var(--ink); border: 1px solid #fff; }
+    .hero-note { background: white; border: 1px solid var(--line); border-radius: 28px; padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
+    .hero-note h2 { margin: 0 0 5px; font-size: 1.2rem; }
+    .hero-note > p { color: var(--muted); margin: 0 0 18px; font-size: .9rem; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat { border-radius: 17px; padding: 13px 8px; background: var(--pink-soft); text-align: center; }
+    .stat:nth-child(2) { background: var(--yellow-soft); }
+    .stat:nth-child(3) { background: #f1eaff; }
+    .stat strong { display: block; font-size: 1.6rem; line-height: 1.2; }
+    .stat span { color: var(--muted); font-size: .72rem; font-weight: 800; }
+    .section-title { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin: 24px 0 16px; }
+    .section-title h2 { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); letter-spacing: -.8px; }
+    .section-title p { color: var(--muted); margin: 3px 0 0; font-size: .88rem; }
+    .section-title .sticker { font-size: 1.8rem; }
+    .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .day-card { border: 1px solid var(--line); border-radius: 20px; background: white; overflow: hidden; box-shadow: 0 6px 22px #a75b7909; }
+    .day-head { padding: 13px 14px; background: var(--yellow-soft); display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .day-card:nth-child(even) .day-head { background: var(--pink-soft); }
+    .day-head strong { font-size: .92rem; }
+    .day-head span { font-size: .72rem; color: var(--muted); }
+    .day-body { padding: 13px; }
+    .duty-label { color: var(--muted); font-size: .68rem; text-transform: uppercase; font-weight: 900; letter-spacing: .6px; margin-bottom: 6px; }
+    .student-list { display: flex; flex-wrap: wrap; gap: 5px; min-height: 45px; align-content: start; }
+    .student-chip { display: inline-block; background: #fff1f6; color: #a53d6a; border-radius: 8px; padding: 4px 7px; font-size: .73rem; font-weight: 800; }
+    .day-card:nth-child(even) .student-chip { background: #fff6d8; color: #8a6510; }
+    .day-task { margin-top: 13px; padding-top: 11px; border-top: 1px dashed var(--line); color: #635365; font-size: .79rem; }
+    .day-task strong { display: block; color: var(--ink); font-size: .74rem; margin-bottom: 3px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .search { flex: 1; min-width: 180px; position: relative; }
+    .search input, .field input, .field select, .field textarea { width: 100%; border: 1px solid #ecdde5; border-radius: 12px; padding: 11px 12px; outline: none; background: white; color: var(--ink); }
+    .search input:focus, .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--pink); box-shadow: 0 0 0 3px #ff8fbd24; }
+    .btn-pink { background: var(--pink); color: #52283b; box-shadow: 0 4px 0 #e777a5; }
+    .btn-yellow { background: var(--yellow); color: #54411b; box-shadow: 0 4px 0 #e7b92e; }
+    .btn-outline { background: white; border: 1px solid var(--line); color: var(--ink); }
+    .tasks-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; align-items: start; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 22px; padding: 20px; box-shadow: var(--shadow); }
+    .panel h3 { margin: 0 0 14px; font-size: 1.1rem; }
+    .task-list { display: grid; gap: 10px; }
+    .task-item { display: grid; grid-template-columns: auto 1fr auto; gap: 11px; align-items: start; border: 1px solid #f2e5eb; border-radius: 15px; padding: 12px; }
+    .task-item.done { background: #f5fbf7; opacity: .78; }
+    .task-item.done .task-name { text-decoration: line-through; color: #6f8c7b; }
+    .check { accent-color: var(--pink-dark); width: 18px; height: 18px; margin-top: 3px; }
+    .task-name { font-weight: 850; font-size: .92rem; overflow-wrap: anywhere; }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+    .tag { font-size: .7rem; font-weight: 850; padding: 4px 7px; border-radius: 7px; background: var(--yellow-soft); color: #866516; }
+    .tag.pink { background: var(--pink-soft); color: #a63e6b; }
+    .task-delete { border: 0; background: #fff0f4; color: #bd4875; border-radius: 9px; width: 31px; height: 31px; font-weight: 900; }
+    .empty { color: var(--muted); text-align: center; padding: 28px 12px; border: 1px dashed #ecdde5; border-radius: 15px; }
+    .form-grid { display: grid; gap: 12px; }
+    .field label { display: block; font-size: .79rem; font-weight: 900; margin-bottom: 5px; }
+    .field textarea { resize: vertical; min-height: 76px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-footnote { font-size: .76rem; color: var(--muted); margin: 12px 0 0; }
+    .class-rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0 42px; }
+    .rule { background: #fff; border: 1px solid var(--line); border-radius: 17px; padding: 15px; display: flex; gap: 10px; align-items: start; }
+    .rule span { font-size: 1.35rem; }
+    .rule p { margin: 0; font-size: .82rem; color: var(--muted); }
+    .rule strong { display: block; color: var(--ink); margin-bottom: 2px; }
+    footer { border-top: 1px solid var(--line); padding: 20px 0 30px; color: var(--muted); font-size: .8rem; }
+    .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 20; background: var(--ink); color: white; padding: 12px 17px; border-radius: 13px; box-shadow: var(--shadow); transition: .22s; max-width: calc(100% - 30px); text-align: center; font-size: .9rem; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 900px) { .week-grid { grid-template-columns: repeat(3, 1fr); } .hero { grid-template-columns: 1fr; } .tasks-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) {
+      .wrap { width: min(100% - 24px, 520px); }
+      .topbar { align-items: flex-start; }
+      .today-pill { font-size: .72rem; padding: 8px 10px; }
+      .hero-copy { padding: 25px 22px; }
+      .hero-note { padding: 20px; }
+      .week-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .day-head { padding: 11px; }
+      .day-body { padding: 10px; }
+      .section-title { align-items: center; }
+      .section-title .sticker { display: none; }
+      .class-rules { grid-template-columns: 1fr; }
+      .panel { padding: 15px; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: white; }
+      header, .hero-buttons, .toolbar, .form-panel, .task-delete, .check, footer, .toast { display: none !important; }
+      .hero { padding: 0; display: block; }
+      .hero-copy { padding: 15px; }
+      .hero-note { margin-top: 10px; }
+      section { padding: 12px 0; }
+      .panel, .day-card { box-shadow: none; break-inside: avoid; }
+      .week-grid { grid-template-columns: repeat(5, 1fr); }
+      .tasks-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <a class="brand" href="#beranda">
+        <span class="brand-mark">✿</span>
+        <span>Piket Ceria<small>Jadwal piket & tugas kelas</small></span>
+      </a>
+      <div class="today-pill" id="todayLabel">🌼 Hari ini</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="beranda">
+      <div class="hero-copy">
+        <span class="eyebrow">🌈 Kelas rapi, belajar happy!</span>
+        <h1>Bareng-bareng bikin kelas <span style="color:#d84e87">makin ceria.</span></h1>
+        <p>Atur jadwal piket, catat tugas, dan tandai pekerjaan yang sudah selesai. Semua jadi lebih teratur dengan warna kuning dan pink yang manis!</p>
+        <div class="hero-buttons">
+          <a class="btn btn-dark" href="#jadwal">Lihat jadwal ↓</a>
+          <a class="btn btn-white" href="#tugas">Kelola tugas ✨</a>
+        </div>
+      </div>
+      <aside class="hero-note">
+        <h2>📌 Ringkasan kelas</h2>
+        <p>Semangat sedikit demi sedikit, kelas jadi nyaman untuk semua.</p>
+        <div class="stat-grid">
+          <div class="stat"><strong id="statDays">5</strong><span>Hari piket</span></div>
+          <div class="stat"><strong id="statTasks">0</strong><span>Total tugas</span></div>
+          <div class="stat"><strong id="statDone">0</strong><span>Selesai</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="jadwal">
+      <div class="section-title">
+        <div><h2>🌷 Jadwal piket mingguan</h2><p>Contoh nama bisa kamu ubah sesuai anggota kelas.</p></div>
+        <span class="sticker">🧹</span>
+      </div>
+      <div class="week-grid" id="weekGrid"></div>
+    </section>
+
+    <section id="tugas">
+      <div class="section-title">
+        <div><h2>📝 Daftar tugas kelas</h2><p>Tambah tugas baru, cari tugas, dan tandai jika sudah selesai.</p></div>
+        <span class="sticker">⭐</span>
+      </div>
+      <div class="toolbar">
+        <div class="search"><input id="searchInput" type="search" placeholder="🔎 Cari nama tugas atau penanggung jawab..." aria-label="Cari tugas"></div>
+        <button class="btn btn-outline" id="filterBtn" type="button">Tampilkan: Semua</button>
+        <button class="btn btn-yellow" id="printBtn" type="button">🖨️ Cetak</button>
+      </div>
+      <div class="tasks-layout">
+        <div class="panel">
+          <h3>✨ Tugas yang tercatat</h3>
+          <div class="task-list" id="taskList"></div>
+        </div>
+        <aside class="panel form-panel">
+          <h3>💌 Tambah tugas baru</h3>
+          <form id="taskForm" class="form-grid">
+            <div class="field"><label for="taskTitle">Nama tugas *</label><input id="taskTitle" name="taskTitle" required maxlength="100" placeholder="Contoh: Membawa alat kebersihan"></div>
+            <div class="field"><label for="taskPerson">Penanggung jawab</label><input id="taskPerson" name="taskPerson" maxlength="70" placeholder="Nama siswa / kelompok"></div>
+            <div class="field-row">
+              <div class="field"><label for="taskDay">Hari</label><select id="taskDay" name="taskDay"><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option></select></div>
+              <div class="field"><label for="taskDue">Tenggat</label><input id="taskDue" name="taskDue" type="date"></div>
+            </div>
+            <div class="field"><label for="taskNotes">Catatan (opsional)</label><textarea id="taskNotes" name="taskNotes" maxlength="240" placeholder="Detail tugas atau pengingat..."></textarea></div>
+            <button class="btn btn-pink" type="submit">＋ Simpan tugas</button>
+          </form>
+          <p class="form-footnote">Data disimpan di browser perangkat ini. Kalau data browser dihapus, daftar juga bisa ikut terhapus.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><h2>💛 Kesepakatan kelas</h2><p>Kebiasaan kecil yang bikin suasana kelas lebih nyaman.</p></div></div>
+      <div class="class-rules">
+        <div class="rule"><span>🧹</span><p><strong>Datang sesuai jadwal</strong>Lakukan piket sebelum pelajaran dimulai.</p></div>
+        <div class="rule"><span>🤝</span><p><strong>Kerja sama</strong>Bagi tugas dengan adil dan saling bantu.</p></div>
+        <div class="rule"><span>🌟</span><p><strong>Centang jika selesai</strong>Periksa kembali tugas agar tidak terlewat.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footer-inner"><span>✿ Piket Ceria — Jadwal piket & tugas kelas</span><span>Dibuat dengan 💛 dan 💗 untuk kelas yang kompak.</span></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const defaultSchedule = [
+      { day: 'Senin', names: ['Alya', 'Bima', 'Citra', 'Dimas'], task: 'Menyapu lantai, merapikan meja, menghapus papan tulis.' },
+      { day: 'Selasa', names: ['Eka', 'Fajar', 'Gita', 'Hana'], task: 'Menyapu kelas, merapikan kursi, membuang sampah.' },
+      { day: 'Rabu', names: ['Indra', 'Jihan', 'Kevin', 'Lala'], task: 'Membersihkan papan tulis, menyapu, merapikan pojok kelas.' },
+      { day: 'Kamis', names: ['Mira', 'Nanda', 'Oki', 'Putri'], task: 'Menyapu lantai, merapikan meja, mengecek tempat sampah.' },
+      { day: 'Jumat', names: ['Rafi', 'Salsa', 'Tio', 'Vina'], task: 'Piket bersama, merapikan kelas, menyiram tanaman.' }
+    ];
+    const starterTasks = [
+      { id: 1, title: 'Membawa alat kebersihan', person: 'Kelompok piket', day: 'Senin', due: '', notes: 'Sapu dan kemoceng', done: false },
+      { id: 2, title: 'Mengumpulkan tugas matematika', person: 'Semua siswa', day: 'Selasa', due: '', notes: 'Periksa kembali sebelum dikumpulkan', done: false },
+      { id: 3, title: 'Merapikan pojok baca', person: 'Petugas kelas', day: 'Jumat', due: '', notes: 'Susun buku dengan rapi', done: true }
+    ];
+    const STORAGE_KEY = 'piketCeriaTasksV1';
+    let tasks = loadTasks();
+    let showOnlyOpen = false;
+    let nextId = Math.max(0, ...tasks.map(t => Number(t.id) || 0)) + 1;
+
+    function loadTasks() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : starterTasks.map(t => ({...t}));
+      } catch (e) {
+        return starterTasks.map(t => ({...t}));
+      }
+    }
+    function saveTasks() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+      catch (e) { showToast('Tidak bisa menyimpan di browser ini. Kamu masih bisa menggunakan daftar selama halaman terbuka.'); }
+    }
+    function escapeHTML(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function renderSchedule() {
+      document.getElementById('weekGrid').innerHTML = defaultSchedule.map((day, i) => `
+        <article class="day-card">
+          <div class="day-head"><strong>${day.day}</strong><span>${String(i + 1).padStart(2, '0')} / 05</span></div>
+          <div class="day-body">
+            <div class="duty-label">Anggota piket</div>
+            <div class="student-list">${day.names.map(name => `<span class="student-chip">${escapeHTML(name)}</span>`).join('')}</div>
+            <div class="day-task"><strong>🧽 Tugas hari ini</strong>${escapeHTML(day.task)}</div>
+          </div>
+        </article>`).join('');
+    }
+    function formatDate(dateString) {
+      if (!dateString) return 'Tanpa tenggat';
+      const d = new Date(dateString + 'T00:00:00');
+      return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function renderTasks() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = tasks.filter(t => {
+        const matches = [t.title, t.person, t.day, t.notes].join(' ').toLowerCase().includes(query);
+        return matches && (!showOnlyOpen || !t.done);
+      });
+      const list = document.getElementById('taskList');
+      if (!filtered.length) {
+        list.innerHTML = '<div class="empty">🌸 Belum ada tugas yang cocok.<br>Coba kata kunci lain atau tambahkan tugas baru.</div>';
+      } else {
+        list.innerHTML = filtered.map(t => `
+          <article class="task-item ${t.done ? 'done' : ''}">
+            <input class="check" type="checkbox" aria-label="Tandai ${escapeHTML(t.title)} selesai" data-action="toggle" data-id="${Number(t.id)}" ${t.done ? 'checked' : ''}>
+            <div>
+              <div class="task-name">${escapeHTML(t.title)}</div>
+              <div class="task-meta">
+                <span class="tag">${escapeHTML(t.day || 'Belum ditentukan')}</span>
+                <span class="tag pink">👤 ${escapeHTML(t.person || 'Belum ada PIC')}</span>
+                ${t.due ? `<span class="tag">📅 ${escapeHTML(formatDate(t.due))}</span>` : ''}
+              </div>
+              ${t.notes ? `<div style="font-size:.8rem;color:#817282;margin-top:7px">${escapeHTML(t.notes)}</div>` : ''}
+            </div>
+            <button class="task-delete" type="button" aria-label="Hapus tugas ${escapeHTML(t.title)}" title="Hapus tugas" data-action="delete" data-id="${Number(t.id)}">×</button>
+          </article>`).join('');
+      }
+      document.getElementById('statTasks').textContent = tasks.length;
+      document.getElementById('statDone').textContent = tasks.filter(t => t.done).length;
+      document.getElementById('filterBtn').textContent = showOnlyOpen ? 'Tampilkan: Belum selesai' : 'Tampilkan: Semua';
+    }
+    function showToast(message) {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+    document.getElementById('taskForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const title = document.getElementById('taskTitle').value.trim();
+      if (!title) { showToast('Nama tugas tidak boleh kosong ya!'); return; }
+      tasks.unshift({
+        id: nextId++,
+        title,
+        person: document.getElementById('taskPerson').value.trim(),
+        day: document.getElementById('taskDay').value,
+        due: document.getElementById('taskDue').value,
+        notes: document.getElementById('taskNotes').value.trim(),
+        done: false
+      });
+      saveTasks();
+      renderTasks();
+      event.target.reset();
+      document.getElementById('taskTitle').focus();
+      showToast('Tugas baru berhasil ditambahkan! 💗');
+    });
+    document.getElementById('taskList').addEventListener('change', event => {
+      const input = event.target.closest('[data-action="toggle"]');
+      if (!input) return;
+      const task = tasks.find(t => Number(t.id) === Number(input.dataset.id));
+      if (task) {
+        task.done = input.checked;
+        saveTasks();
+        renderTasks();
+        showToast(task.done ? 'Yeay, tugas selesai! 🌟' : 'Tugas ditandai belum selesai.');
+      }
+    });
+    document.getElementById('taskList').addEventListener('click', event => {
+      const button = event.target.closest('[data-action="delete"]');
+      if (!button) return;
+      const task = tasks.find(t => Number(t.id) === Number(button.dataset.id));
+      if (!task) return;
+      if (confirm(`Hapus tugas "${task.title}"?`)) {
+        tasks = tasks.filter(t => Number(t.id) !== Number(button.dataset.id));
+        saveTasks();
+        renderTasks();
+        showToast('Tugas sudah dihapus.');
+      }
+    });
+    document.getElementById('searchInput').addEventListener('input', renderTasks);
+    document.getElementById('filterBtn').addEventListener('click', () => {
+      showOnlyOpen = !showOnlyOpen;
+      renderTasks();
+    });
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    const now = new Date();
+    document.getElementById('todayLabel').textContent = '🌼 ' + now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    renderSchedule();
+    renderTasks();
+  </script>
+</body>
+</html>
